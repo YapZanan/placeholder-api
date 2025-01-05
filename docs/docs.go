@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/placeholder": {
             "get": {
-                "description": "Generates a placeholder image with specified dimensions, text, and colors.",
+                "description": "Generates a placeholder image with specified dimensions, text, and colors. The image size is limited to a maximum of 1000x1000 pixels.",
                 "produces": [
                     "image/png"
                 ],
@@ -26,14 +26,14 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "default": 400,
-                        "description": "Width of the image",
+                        "description": "Width of the image (max 1920)",
                         "name": "width",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "default": 300,
-                        "description": "Height of the image",
+                        "description": "Height of the image (max 1920)",
                         "name": "height",
                         "in": "query"
                     },
@@ -67,13 +67,19 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "The generated placeholder image",
                         "schema": {
                             "type": "file"
                         }
                     },
                     "400": {
-                        "description": "Invalid input parameters",
+                        "description": "Invalid input parameters or image too large",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error, failed to generate image or encode it",
                         "schema": {
                             "type": "string"
                         }
@@ -87,11 +93,11 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:5000",
+	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Placeholder API",
-	Description:      "This is a simple API to generate placeholder images.",
+	Description:      "This is an API to generate placeholder images.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

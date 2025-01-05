@@ -23,6 +23,8 @@ import (
 )
 
 var cachedFont *opentype.Font
+var cachedFontFaces = map[float64]font.Face{}
+var img *image.RGBA
 
 type PlaceholderParams struct {
 	Width     int
@@ -33,26 +35,56 @@ type PlaceholderParams struct {
 	FontColor string
 }
 
+func getFontFace(fontSize float64) (font.Face, error) {
+	// Check if font face is already cached
+	if face, ok := cachedFontFaces[fontSize]; ok {
+		return face, nil
+	}
+
+	// If not cached, create and cache it
+	face, err := opentype.NewFace(cachedFont, &opentype.FaceOptions{
+		Size:    fontSize,
+		DPI:     72,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Limit cache size
+	if len(cachedFontFaces) >= 5 {
+		for k := range cachedFontFaces {
+			delete(cachedFontFaces, k)
+			break
+		}
+	}
+
+	cachedFontFaces[fontSize] = face
+	return face, nil
+}
+
 // @title Placeholder API
 // @version 1.0
 // @description This is an API to generate placeholder images.
 // @BasePath /
 
 // @Summary Generate a placeholder image
-// @Description Generates a placeholder image with specified dimensions, text, and colors.
+// @Description Generates a placeholder image with specified dimensions, text, and colors. The image size is limited to a maximum of 1000x1000 pixels.
 // @Produce png
-// @Param width query int false "Width of the image" default(400)
-// @Param height query int false "Height of the image" default(300)
+// @Param width query int false "Width of the image (max 1920)" default(400)
+// @Param height query int false "Height of the image (max 1920)" default(300)
 // @Param text query string false "Text to display" default(Placeholder)
 // @Param font_size query float64 false "Font size of the text"
 // @Param bg_color query string false "Background color in hex format" default(#FFFFFF)
 // @Param font_color query string false "Font color in hex format" default(#000000)
-// @Success 200 {file} png
-// @Failure 400 {string} string "Invalid input parameters"
+// @Success 200 {file} png "The generated placeholder image"
+// @Failure 400 {string} string "Invalid input parameters or image too large"
+// @Failure 500 {string} string "Internal server error, failed to generate image or encode it"
 // @Router /placeholder [get]
 func placeholderHandler(w http.ResponseWriter, r *http.Request) {
 	params := getRequestParams(r)
 
+	// Parse background and font colors
 	background, err := parseHexColor(params.BgColor)
 	if err != nil {
 		http.Error(w, "Invalid background color", http.StatusBadRequest)
@@ -68,10 +100,19 @@ func placeholderHandler(w http.ResponseWriter, r *http.Request) {
 		params.FontSize = calculateFontSize(params.Text, params.Width, params.Height)
 	}
 
-	img := image.NewRGBA(image.Rect(0, 0, params.Width, params.Height))
-	draw.Draw(img, img.Bounds(), &image.Uniform{C: background}, image.Point{}, draw.Src)
+	// Reuse or create a new image if necessary
+	if img == nil || img.Rect.Dx() != params.Width || img.Rect.Dy() != params.Height {
+		if params.Width > 1920 || params.Height > 1920 {
+			http.Error(w, "Image size too large", http.StatusBadRequest)
+			return
+		}
+		img = image.NewRGBA(image.Rect(0, 0, params.Width, params.Height))
+	} else {
+		// Reset image contents
+		draw.Draw(img, img.Bounds(), &image.Uniform{C: background}, image.Point{}, draw.Src)
+	}
 
-	face, err := opentype.NewFace(cachedFont, &opentype.FaceOptions{Size: params.FontSize, DPI: 72, Hinting: font.HintingFull})
+	face, err := getFontFace(params.FontSize)
 	if err != nil {
 		http.Error(w, "Failed to create font face", http.StatusInternalServerError)
 		log.Println("Font face error:", err)
@@ -124,11 +165,13 @@ func addText(img *image.RGBA, text string, face font.Face, width, height int, fo
 func calculateFontSize(text string, width, height int) float64 {
 	maxFontSize := float64(height) * 0.4
 	fontSize := maxFontSize
-	face, _ := opentype.NewFace(cachedFont, &opentype.FaceOptions{Size: fontSize, DPI: 72, Hinting: font.HintingFull})
+
+	// Pre-create the font face once for the starting size
+	face, _ := getFontFace(fontSize)
 
 	for font.MeasureString(face, text).Ceil() > width-20 && fontSize > 10 {
 		fontSize -= 1
-		face, _ = opentype.NewFace(cachedFont, &opentype.FaceOptions{Size: fontSize, DPI: 72, Hinting: font.HintingFull})
+		face, _ = getFontFace(fontSize) // Reuse the same method to get the font face
 	}
 
 	return fontSize

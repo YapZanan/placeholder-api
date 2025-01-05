@@ -1,23 +1,22 @@
 basePath: /
-host: localhost:5000
 info:
   contact: {}
-  description: This is a simple API to generate placeholder images.
+  description: This is an API to generate placeholder images.
   title: Placeholder API
   version: "1.0"
 paths:
   /placeholder:
     get:
       description: Generates a placeholder image with specified dimensions, text,
-        and colors.
+        and colors. The image size is limited to a maximum of 1000x1000 pixels.
       parameters:
       - default: 400
-        description: Width of the image
+        description: Width of the image (max 1920)
         in: query
         name: width
         type: integer
       - default: 300
-        description: Height of the image
+        description: Height of the image (max 1920)
         in: query
         name: height
         type: integer
@@ -44,11 +43,15 @@ paths:
       - image/png
       responses:
         "200":
-          description: OK
+          description: The generated placeholder image
           schema:
             type: file
         "400":
-          description: Invalid input parameters
+          description: Invalid input parameters or image too large
+          schema:
+            type: string
+        "500":
+          description: Internal server error, failed to generate image or encode it
           schema:
             type: string
       summary: Generate a placeholder image

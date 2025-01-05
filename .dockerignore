@@ -1,6 +1,6 @@
-# Exclude the following files and directories from the Docker build context
 .git
 node_modules
 vendor
 *.log
 *.md
+.main.py
