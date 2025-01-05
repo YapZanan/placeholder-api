@@ -1,0 +1,55 @@
+basePath: /
+host: localhost:5000
+info:
+  contact: {}
+  description: This is a simple API to generate placeholder images.
+  title: Placeholder API
+  version: "1.0"
+paths:
+  /placeholder:
+    get:
+      description: Generates a placeholder image with specified dimensions, text,
+        and colors.
+      parameters:
+      - default: 400
+        description: Width of the image
+        in: query
+        name: width
+        type: integer
+      - default: 300
+        description: Height of the image
+        in: query
+        name: height
+        type: integer
+      - default: Placeholder
+        description: Text to display
+        in: query
+        name: text
+        type: string
+      - description: Font size of the text
+        in: query
+        name: font_size
+        type: number
+      - default: '#FFFFFF'
+        description: Background color in hex format
+        in: query
+        name: bg_color
+        type: string
+      - default: '#000000'
+        description: Font color in hex format
+        in: query
+        name: font_color
+        type: string
+      produces:
+      - image/png
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "400":
+          description: Invalid input parameters
+          schema:
+            type: string
+      summary: Generate a placeholder image
+swagger: "2.0"

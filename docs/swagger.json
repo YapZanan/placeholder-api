@@ -1,0 +1,79 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a simple API to generate placeholder images.",
+        "title": "Placeholder API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:5000",
+    "basePath": "/",
+    "paths": {
+        "/placeholder": {
+            "get": {
+                "description": "Generates a placeholder image with specified dimensions, text, and colors.",
+                "produces": [
+                    "image/png"
+                ],
+                "summary": "Generate a placeholder image",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 400,
+                        "description": "Width of the image",
+                        "name": "width",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 300,
+                        "description": "Height of the image",
+                        "name": "height",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "Placeholder",
+                        "description": "Text to display",
+                        "name": "text",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Font size of the text",
+                        "name": "font_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "#FFFFFF",
+                        "description": "Background color in hex format",
+                        "name": "bg_color",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "#000000",
+                        "description": "Font color in hex format",
+                        "name": "font_color",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input parameters",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
