@@ -13,12 +13,12 @@ paths:
       - default: 400
         description: Width of the image (max 1920)
         in: query
-        name: width
+        name: w
         type: integer
       - default: 300
         description: Height of the image (max 1920)
         in: query
-        name: height
+        name: h
         type: integer
       - default: Placeholder
         description: Text to display

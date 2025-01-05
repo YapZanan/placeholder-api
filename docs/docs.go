@@ -27,14 +27,14 @@ const docTemplate = `{
                         "type": "integer",
                         "default": 400,
                         "description": "Width of the image (max 1920)",
-                        "name": "width",
+                        "name": "w",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "default": 300,
                         "description": "Height of the image (max 1920)",
-                        "name": "height",
+                        "name": "h",
                         "in": "query"
                     },
                     {

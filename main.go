@@ -71,8 +71,8 @@ func getFontFace(fontSize float64) (font.Face, error) {
 // @Summary Generate a placeholder image
 // @Description Generates a placeholder image with specified dimensions, text, and colors. The image size is limited to a maximum of 1000x1000 pixels.
 // @Produce png
-// @Param width query int false "Width of the image (max 1920)" default(400)
-// @Param height query int false "Height of the image (max 1920)" default(300)
+// @Param w query int false "Width of the image (max 1920)" default(400)
+// @Param h query int false "Height of the image (max 1920)" default(300)
 // @Param text query string false "Text to display" default(Placeholder)
 // @Param font_size query float64 false "Font size of the text"
 // @Param bg_color query string false "Background color in 8-character hex format without '#'. The last 2 characters represent alpha (transparency)" default(FFFFFF00)
@@ -183,25 +183,36 @@ func getRequestParams(r *http.Request) PlaceholderParams {
 		Height:    300,
 		Text:      "Placeholder",
 		FontSize:  0,
-		BgColor:   "#FFFFFF",
-		FontColor: "#000000",
+		BgColor:   "FFFFFF00",
+		FontColor: "000000FF",
 	}
 
-	if value := r.URL.Query().Get("width"); value != "" {
+	if value := r.URL.Query().Get("width"); value != "" || r.URL.Query().Get("w") != "" {
+		if value == "" {
+			value = r.URL.Query().Get("w") // Use `w` if `width` is empty
+		}
 		params.Width, _ = strconv.Atoi(value)
 	}
-	if value := r.URL.Query().Get("height"); value != "" {
+
+	if value := r.URL.Query().Get("height"); value != "" || r.URL.Query().Get("h") != "" {
+		if value == "" {
+			value = r.URL.Query().Get("h") // Use `h` if `height` is empty
+		}
 		params.Height, _ = strconv.Atoi(value)
 	}
+
 	if value := r.URL.Query().Get("text"); value != "" {
 		params.Text = value
 	}
+
 	if value := r.URL.Query().Get("font_size"); value != "" {
 		params.FontSize, _ = strconv.ParseFloat(value, 64)
 	}
+
 	if value := r.URL.Query().Get("bg_color"); value != "" {
 		params.BgColor = value
 	}
+
 	if value := r.URL.Query().Get("font_color"); value != "" {
 		params.FontColor = value
 	}
