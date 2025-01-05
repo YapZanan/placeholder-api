@@ -75,8 +75,8 @@ func getFontFace(fontSize float64) (font.Face, error) {
 // @Param height query int false "Height of the image (max 1920)" default(300)
 // @Param text query string false "Text to display" default(Placeholder)
 // @Param font_size query float64 false "Font size of the text"
-// @Param bg_color query string false "Background color in hex format" default(#FFFFFF)
-// @Param font_color query string false "Font color in hex format" default(#000000)
+// @Param bg_color query string false "Background color in 8-character hex format without '#'. The last 2 characters represent alpha (transparency)" default(FFFFFF00)
+// @Param font_color query string false "Font color in 8-character hex format without '#'. The last 2 characters represent alpha (transparency)" default(000000FF)
 // @Success 200 {file} png "The generated placeholder image"
 // @Failure 400 {string} string "Invalid input parameters or image too large"
 // @Failure 500 {string} string "Internal server error, failed to generate image or encode it"
@@ -129,22 +129,22 @@ func placeholderHandler(w http.ResponseWriter, r *http.Request) {
 
 func parseHexColor(colorStr string) (color.Color, error) {
 	colorStr = strings.TrimSpace(colorStr)
-	if strings.HasPrefix(colorStr, "#") {
-		var r, g, b int
-		_, err := fmt.Sscanf(colorStr, "#%02x%02x%02x", &r, &g, &b)
-		if err != nil {
-			return nil, err
-		}
-		return color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: 255}, nil
-	} else if strings.HasPrefix(colorStr, "rgb") {
-		var r, g, b int
-		_, err := fmt.Sscanf(colorStr, "rgb(%d,%d,%d)", &r, &g, &b)
-		if err != nil {
-			return nil, err
-		}
-		return color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: 255}, nil
+	// Unconditionally remove the '#' prefix if it exists
+	colorStr = strings.TrimPrefix(colorStr, "#")
+
+	// Ensure the color string is exactly 8 characters long (RGBA format)
+	if len(colorStr) != 8 {
+		return nil, fmt.Errorf("invalid color format: must be an 8-character hex string (RGBA)")
 	}
-	return nil, fmt.Errorf("invalid color format")
+
+	var r, g, b, a int
+	_, err := fmt.Sscanf(colorStr, "%02x%02x%02x%02x", &r, &g, &b, &a)
+	if err != nil {
+		return nil, fmt.Errorf("invalid color format: %v", err)
+	}
+
+	// Return the parsed RGBA color
+	return color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}, nil
 }
 
 func addText(img *image.RGBA, text string, face font.Face, width, height int, fontColor color.Color) {

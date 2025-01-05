@@ -29,13 +29,15 @@ paths:
         in: query
         name: font_size
         type: number
-      - default: '#FFFFFF'
-        description: Background color in hex format
+      - default: FFFFFF00
+        description: Background color in 8-character hex format without '#'. The last
+          2 characters represent alpha (transparency)
         in: query
         name: bg_color
         type: string
-      - default: '#000000'
-        description: Font color in hex format
+      - default: 000000FF
+        description: Font color in 8-character hex format without '#'. The last 2
+          characters represent alpha (transparency)
         in: query
         name: font_color
         type: string

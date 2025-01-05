@@ -52,15 +52,15 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "default": "#FFFFFF",
-                        "description": "Background color in hex format",
+                        "default": "FFFFFF00",
+                        "description": "Background color in 8-character hex format without '#'. The last 2 characters represent alpha (transparency)",
                         "name": "bg_color",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "default": "#000000",
-                        "description": "Font color in hex format",
+                        "default": "000000FF",
+                        "description": "Font color in 8-character hex format without '#'. The last 2 characters represent alpha (transparency)",
                         "name": "font_color",
                         "in": "query"
                     }
