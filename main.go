@@ -70,8 +70,8 @@ func getFontFace(fontSize float64) (font.Face, error) {
 // @Summary Generate a placeholder image
 // @Description Generates a placeholder image with specified dimensions, text, and colors. The image size is limited to a maximum of 1000x1000 pixels.
 // @Produce png
-// @Param w query int false "Width of the image (max 8000)" default(400)
-// @Param h query int false "Height of the image (max 8000)" default(300)
+// @Param w query int false "Width of the image (max 4000)" default(400)
+// @Param h query int false "Height of the image (max 4000)" default(300)
 // @Param text query string false "Text to display" default(Placeholder)
 // @Param font_size query float64 false "Font size of the text"
 // @Param bg_color query string false "Background color in 8-character hex format without '#'. The last 2 characters represent alpha (transparency)" default(FFFFFF00)
@@ -101,7 +101,7 @@ func placeholderHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Reuse or create a new image if necessary
 	if img == nil || img.Rect.Dx() != params.Width || img.Rect.Dy() != params.Height {
-		if params.Width > 8000 || params.Height > 8000 {
+		if params.Width > 4000 || params.Height > 4000 {
 			http.Error(w, "Image size too large", http.StatusBadRequest)
 			return
 		}
