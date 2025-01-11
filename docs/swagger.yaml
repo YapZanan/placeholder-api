@@ -11,12 +11,12 @@ paths:
         and colors. The image size is limited to a maximum of 1000x1000 pixels.
       parameters:
       - default: 400
-        description: Width of the image (max 1920)
+        description: Width of the image (max 8000)
         in: query
         name: w
         type: integer
       - default: 300
-        description: Height of the image (max 1920)
+        description: Height of the image (max 8000)
         in: query
         name: h
         type: integer
