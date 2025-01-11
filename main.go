@@ -41,7 +41,6 @@ func getFontFace(fontSize float64) (font.Face, error) {
 		return face, nil
 	}
 
-	// If not cached, create and cache it
 	face, err := opentype.NewFace(cachedFont, &opentype.FaceOptions{
 		Size:    fontSize,
 		DPI:     72,
