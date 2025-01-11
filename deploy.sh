@@ -2,7 +2,7 @@ REPO_DIR="/home/bersama/Naufal/placeholder-api"
 
 CONTAINER_NAME="placeholder-server"
 
-cd $REPO_DIR
+cd $REPO_DIR || exit 1
 
 git fetch origin
 
@@ -14,9 +14,9 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     git pull origin main
 
-    docker-compose build
+    docker-compose build placeholder-server
 
-    docker-compose up -d
+    docker-compose up -d placeholder-server
 
     echo "Deployment complete."
 else
