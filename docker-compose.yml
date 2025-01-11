@@ -1,12 +1,22 @@
 services:
   placeholder-server:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: yapzanan/placeholder-api:latest
     ports:
       - "5000:5000"
     environment:
       - PORT=5000
+    networks:
+      - app-network
+    restart: always
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_DEBUG=true
+    restart: always
     networks:
       - app-network
 
